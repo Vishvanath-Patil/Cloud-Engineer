@@ -1,4 +1,4 @@
-# 1.How To Access A Private EC2 Instance Using AWS SSM?
+# 1. How To Access A Private EC2 Instance Using AWS SSM?
 Link --> https://devopscube.com/aws-ssm/
 
 # 2. Setup OpenVPN Server In EC2 For Secure AWS Access
