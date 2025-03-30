@@ -40,13 +40,25 @@ Ensure the following requirements are met before starting the implementation:
    - **Private subnet**: `10.0.2.0/24`
 5. Associate public subnet with an **Internet Gateway (IGW)**.
 
-### 3.2 Set Up Internet and NAT Gateway
-1. **Internet Gateway (for public subnet)**:
-   - Go to **VPC → Internet Gateways** → **Create IGW**.
-   - Attach it to the VPC.
-2. **NAT Gateway (for private subnet)**:
-   - Go to **VPC → NAT Gateway** → **Create NAT Gateway**.
-   - Attach it to a public subnet.
+## 3.2 Set Up Internet and NAT Gateway
+
+### Internet Gateway (for public subnet)
+
+1. Go to **VPC** → **Internet Gateways** → **Create IGW**.
+2. Attach it to the **VPC**.
+
+### NAT Gateway (for private subnet)
+
+1. Go to **VPC** → **NAT Gateway** → **Create NAT Gateway**.
+2. Attach it to a **public subnet**.
+3. Allocate an **Elastic IP (EIP)** for the NAT Gateway.
+
+### Update Route Tables for Private Subnets
+
+1. Go to **VPC** → **Route Tables**.
+2. Select the **route table** associated with **Private Subnets**.
+3. Add a new route: `0.0.0.0/0 → NAT Gateway ID`. 
+
 
 ## 4. Load Balancing and DNS Configuration
 ### 4.1 Deploy an Application Load Balancer
