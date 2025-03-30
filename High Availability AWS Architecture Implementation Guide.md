@@ -1,4 +1,6 @@
 # **High Availability AWS Architecture Implementation Guide**
+![image](https://github.com/user-attachments/assets/16e4623d-d7ea-4d73-bf7a-2ddb7f2d531a)
+
 
 ## **1. Overview**
 This document provides a step-by-step guide to deploying a high-availability architecture in AWS with the following components:
