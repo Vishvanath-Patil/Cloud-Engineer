@@ -125,7 +125,7 @@ curl http://<target-ec2-private-ip>:9100/metrics
 Or use:
 
 ```bash
-telnet <target-ec2-private-ip> 9100
+curl -v telnet//:<target-ec2-private-ip>:9100
 ```
 
 Ensure:
