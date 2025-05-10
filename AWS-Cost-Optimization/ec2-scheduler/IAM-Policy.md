@@ -95,6 +95,13 @@ Attach this policy to the Lambda **execution role** either by:
 
 1. Creating a custom IAM policy with this JSON and attaching it to the role.
 2. Embedding it inline while creating the role.
+![lambda3](https://github.com/Vishvanath-Patil/AWS-Cost-Optimization-Tasks/assets/130968991/2151130d-3b2f-45eb-a94c-92b75d22cf80)
+
+![lambda2](https://github.com/Vishvanath-Patil/AWS-Cost-Optimization-Tasks/assets/130968991/402de95a-38bd-4ea7-9256-ca476fe5af1d)
+
+
+![lambda1](https://github.com/Vishvanath-Patil/AWS-Cost-Optimization-Tasks/assets/130968991/853cbbc6-5eac-4d91-bb1a-3e489c79a1ec)
+
 
 ---
 
