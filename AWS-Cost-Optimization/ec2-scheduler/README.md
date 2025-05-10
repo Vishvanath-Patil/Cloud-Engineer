@@ -15,19 +15,6 @@ By leveraging AWS Lambda and EventBridge, you can schedule EC2 instances to run 
 
 ---
 
-## 📁 Project Structure
-
-```
-AWS-Cost-Optimization/
-└── ec2-scheduler/
-    ├── lambda_function.py       # Lambda function to start/stop EC2 instances
-    ├── IAM-Policy.md            # IAM policy for Lambda permissions
-    ├── LambdaFunction.md        # Guide to create and configure the Lambda function
-    └── README.md                # Project overview and setup instructions
-```
-
----
-
 ## 🚀 Prerequisites
 
 - An active AWS account
