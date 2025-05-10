@@ -65,7 +65,7 @@ sudo systemctl start prometheus
 sudo systemctl status prometheus
 ```
 
-## 7. Install Node Exporter
+## 7. Install Node Exporter on Prometheus and target servers:
 ```bash
 sudo useradd --system --no-create-home --shell /bin/false node_exporter
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
