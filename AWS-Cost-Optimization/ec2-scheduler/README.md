@@ -3,6 +3,16 @@
 This project automates the starting and stopping of EC2 instances to optimize AWS costs.
 By leveraging AWS Lambda and EventBridge, you can schedule EC2 instances to run only during desired timeframes, such as business hours.
 
+# Problem Statement
+
+### You work for xyz Company. Your company wanted to reduce the bill on unused EC2-Instances during office off hours.
+
+## You are asked to perform the following tasks:
+
+### 1. Stop the EC2-Instances ( Test, Dev & QA ) after 10PM
+
+### 2. Start the EC2-Instances ( Test, Dev & QA ) after 7AM 
+
 ---
 
 ## 📁 Project Structure
