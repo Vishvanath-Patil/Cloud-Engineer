@@ -1,6 +1,6 @@
-# AWS EC2 Instance Stopper – Lambda Script
+# 🛑 AWS EC2 Multi-Region Instance Stopper (Lambda Script)
 
-This AWS Lambda Python script is designed to stop multiple EC2 instances across different regions using the `boto3` AWS SDK. The list of instances is provided in a simple multiline string format (`INSTANCE_LIST`), where each line contains the `InstanceID`, `Name`, `IP_Address`, and `Region`.
+This AWS Lambda Python script stops EC2 instances across multiple AWS regions. Instances are defined in a hardcoded list inside the script. It’s useful for automating shutdowns of development or non-production environments to save costs.
 
 ---
 
@@ -30,6 +30,15 @@ def lambda_handler(event, context):
         print(f"Stopping instances in region {region}: {instance_ids}")
         ec2 = boto3.client('ec2', region_name=region)
         ec2.stop_instances(InstanceIds=instance_ids)
+
+
+INSTANCE_LIST = """
+# InstanceID           Name         IP_Address      Region
+i-0123456789abcde      WebServer1   192.168.1.10    ap-south-1
+i-0abcdef12345678      DBServer     192.168.1.11    us-east-1
+i-0fedcba987654321     AppServer    192.168.1.12    eu-west-1
+# i-00000000000000000  TestServer   192.168.1.99    us-west-2
+"""
 
 ## 🧠 How It Works
 
