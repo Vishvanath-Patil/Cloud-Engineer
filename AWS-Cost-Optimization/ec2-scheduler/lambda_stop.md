@@ -39,7 +39,7 @@ i-0abcdef12345678      DBServer     192.168.1.11    us-east-1
 i-0fedcba987654321     AppServer    192.168.1.12    eu-west-1
 # i-00000000000000000  TestServer   192.168.1.99    us-west-2
 """
-
+```
 ## 🧠 How It Works
 
 ### Step-by-Step Breakdown:
