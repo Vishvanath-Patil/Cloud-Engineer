@@ -36,7 +36,7 @@ This guide walks through the complete process of setting up an alert in Grafana 
 4. Set **Evaluate every** to `1m` and **For** to `5m`.
 5. In the condition, set:
    - **Query (A)**: Use the above PromQL query.
-   - **Condition**: IS ABOVE `70`
+   - **Condition**: IS ABOVE `70` **Select B as input in the dropdown**
 6. Under **Alert Details**, add a message (optional):
    ```text
    CPU usage exceeded 70% on { $labels.instance }. Current: { $values.A }
