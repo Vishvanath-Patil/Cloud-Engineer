@@ -141,3 +141,6 @@ rm /opt/tomcat/conf/keystore_old_*.jks
 If Tomcat is behind an AWS ALB or Nginx reverse proxy, upload the new SSL there first to avoid user downtime.
 
 ---
+
+**Author:** Vishwa
+**Date:** $(date +%F)
