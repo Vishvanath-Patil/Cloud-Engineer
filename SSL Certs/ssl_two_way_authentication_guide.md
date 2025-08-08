@@ -191,10 +191,3 @@ openssl s_client -connect server:443 -cert client.crt -key client.key -CAfile ca
 
 ---
 
-If you want, I can also prepare:
-
-- Sample configuration files for Apache/Nginx/Java apps.
-- Commands for generating keystores.
-- Sample code snippet for client cert validation.
-
-Would you like that?
