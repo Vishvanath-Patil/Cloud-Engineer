@@ -161,6 +161,3 @@ openssl x509 -enddate -noout -in certificate.crt
 - For Java applications, always keep the `truststore.jks` updated with partner CA certs.
 
 ---
-
-**Author:** Vishwa  
-**Date:** 2025-08-08
