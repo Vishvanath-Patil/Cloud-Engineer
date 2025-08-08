@@ -21,7 +21,6 @@ keytool -import -trustcacerts -alias external-server -file server.crt -keystore 
 
 - Always verify the certificate fingerprint before importing.
   
----
 ## 2️⃣ Scenario: Import PKCS12 Keystore into JKS
 **Use Case:** You received a .p12 file from a CA and need to use it in a Java app.
 
@@ -34,7 +33,6 @@ keytool -importkeystore -srckeystore keystore.p12 -srcstoretype pkcs12 -destkeys
 
 - Passwords for source and destination stores may differ.
   
----
 ## 3️⃣ Scenario: Create a New Keystore with Private Key and Cert
 **Use Case:** You have a private key (.key) and a signed certificate (.crt) and want them in a JKS.
 
@@ -70,7 +68,16 @@ keytool -export -alias myalias -keystore keystore.jks -rfc -file public_cert.crt
 keytool -delete -alias partner-cert -keystore truststore.jks -storepass changeit
 ```
 
+---
 
+## 📌 Best Practices for JKS Management
+- Always backup JKS files before making changes.
+- Use strong passwords for keystores.
+- Store JKS files securely (limit OS file permissions).
+- Keep truststore.jks and keystore.jks separate for better security isolation.
+- Regularly rotate keys and certs before expiry.
+
+---
 
 
 
