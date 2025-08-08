@@ -190,5 +190,3 @@ tail -f /opt/tomcat/logs/catalina.out
 
 ---
 
-**Author:** Vishwa  
-**Date:** 2025-08-08
