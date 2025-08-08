@@ -109,6 +109,3 @@ From browser: Visit https://xyz.domain.com and check the certificate details.
 If Apache is behind AWS ALB, CloudFront, or Nginx, update SSL there first before changing on Apache to ensure no service interruption.
 
 ---
-
-**Author:** Vishwa
-**Date:** $(date +%F)
