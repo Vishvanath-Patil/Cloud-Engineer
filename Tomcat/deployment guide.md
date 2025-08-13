@@ -32,7 +32,7 @@ aws elbv2 describe-target-health \
 ```
 Wait until TargetState = "draining" or "unused".
 
-### **Step 2: Stop EIG_OUT Tomcat Service
+### **Step 2: Stop EIG_OUT Tomcat Service**
 ```bash
 cd /prd/EIG_OUT/bin
 ./stop.sh
@@ -40,7 +40,7 @@ ps -ef | grep -i tomcat | grep EIG_OUT
 ```
 Output should be empty.
 
-### ***Step 3: Backup Current WAR**
+### **Step 3: Backup Current WAR**
 ```bash
 cd /prd/EIG_OUT/webapps
 cp EIG_OUT.war /backup/EIG_OUT.war_$(date +%F_%T)
