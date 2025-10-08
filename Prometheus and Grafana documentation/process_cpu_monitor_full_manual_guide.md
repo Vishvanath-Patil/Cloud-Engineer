@@ -282,6 +282,154 @@ Save and run this script:
 ```bash
 sudo bash /tmp/setup-process-monitor-cpu-only.sh
 ```
+```bash
+#!/bin/bash
+set -euo pipefail
+
+NODE_USER="marigold"
+TEXTFILE_DIR="/var/lib/node_exporter/textfile_collector"
+PROCESS_SCRIPT="/usr/local/bin/process_monitor.sh"
+SERVICE_FILE="/etc/systemd/system/process_monitor.service"
+TIMER_FILE="/etc/systemd/system/process_monitor.timer"
+DROPIN_DIR="/etc/systemd/system/node_exporter.service.d"
+DROPIN_FILE="$DROPIN_DIR/10-textfile.conf"
+NODE_EXPORTER_BIN="/usr/local/bin/node_exporter"
+COLLECT_INTERVAL=30     # timer frequency
+SAMPLE_INTERVAL=1       # sampling inside collector
+
+# 1) create textfile dir
+mkdir -p "$TEXTFILE_DIR"
+chown -R "${NODE_USER}:${NODE_USER}" "$TEXTFILE_DIR" 2>/dev/null || true
+chmod 755 "$TEXTFILE_DIR"
+
+# 2) create systemd drop-in for node_exporter
+if [ -x "$NODE_EXPORTER_BIN" ]; then
+  mkdir -p "$DROPIN_DIR"
+  cat > "$DROPIN_FILE" <<EOF
+[Service]
+ExecStart=
+ExecStart=$NODE_EXPORTER_BIN --collector.textfile.directory=$TEXTFILE_DIR
+EOF
+  systemctl daemon-reload || true
+  systemctl enable --now node_exporter || true
+  systemctl restart node_exporter || true
+else
+  echo "Warning: node_exporter binary not found at $NODE_EXPORTER_BIN"
+fi
+
+# 3) write collector with SAMPLE_INTERVAL variable embedded
+cat > "$PROCESS_SCRIPT" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+TEXTFILE_DIR="/var/lib/node_exporter/textfile_collector"
+OUTFILE="$TEXTFILE_DIR/process_cpu_metrics.prom"
+TMPOUT="${OUTFILE}.tmp.$$"
+SAMPLE_INTERVAL=__SAMPLE_INTERVAL__
+NODE_USER="marigold"
+
+NCPU=$(nproc 2>/dev/null || echo 1)
+
+read_total_jiffies() {
+  awk '/^cpu /{s=0; for(i=2;i<=NF;i++) s+=\$i; print s; exit}' /proc/stat
+}
+
+snapshot_pids() {
+  for pid_dir in /proc/[0-9]*; do
+    pid=$(basename "$pid_dir")
+    if [ -r "$pid_dir/stat" ]; then
+      if [ -r "$pid_dir/comm" ]; then
+        comm=$(tr -d '\n' < "$pid_dir/comm")
+      else
+        comm=$(awk '{ match($0,/\\([^)]*\\)/); if (RSTART) print substr($0,RSTART+1,RLENGTH-2) }' "$pid_dir/stat" 2>/dev/null || echo "")
+      fi
+      cpu_jiffies=$(awk '{print $(14) + $(15)}' "$pid_dir/stat" 2>/dev/null || echo 0)
+      if [ -n "$comm" ]; then
+        printf "%s|%s|%s\n" "$pid" "$comm" "$cpu_jiffies"
+      fi
+    fi
+  done
+}
+
+total1=$(read_total_jiffies)
+snap1="/tmp/process_snap_1.$$"
+snapshot_pids > "$snap1"
+
+sleep "$SAMPLE_INTERVAL"
+
+total2=$(read_total_jiffies)
+snap2="/tmp/process_snap_2.$$"
+snapshot_pids > "$snap2"
+
+awk -v ncpu="$NCPU" -v tot1="$total1" -v tot2="$total2" -v s1="$snap1" -v s2="$snap2" '
+BEGIN { FS="|"; }
+END {
+  while ((getline < s1) > 0) { pid=$1; comm=$2; cpu1[pid]=$3; comm_of[pid]=comm; } close(s1);
+  while ((getline < s2) > 0) { pid=$1; comm=$2; cpu2=$3;
+    if (cpu1[pid] != "") { delta = cpu2 - cpu1[pid]; if (delta < 0) delta = 0; } else { delta = 0; }
+    cpu_delta[comm] += delta;
+    proc_count[comm] += 1;
+  } close(s2);
+  total_delta = tot2 - tot1; if (total_delta <= 0) total_delta = 1;
+  print "# HELP process_cpu_percent Total CPU percent aggregated per process name (sampled)";
+  print "# TYPE process_cpu_percent gauge";
+  for (p in cpu_delta) {
+    cpu_pct = (cpu_delta[p] / total_delta) * 100.0 * ncpu;
+    if (cpu_pct != cpu_pct) cpu_pct = 0;
+    printf "process_cpu_percent{process=\"%s\"} %.3f\n", p, cpu_pct;
+  }
+  print "";
+  print "# HELP process_count Number of processes per process name";
+  print "# TYPE process_count gauge";
+  for (p in proc_count) { printf "process_count{process=\"%s\"} %d\n", p, proc_count[p]; }
+}
+' > "$TMPOUT"
+
+mv "$TMPOUT" "$OUTFILE"
+chown "$NODE_USER:$NODE_USER" "$OUTFILE" 2>/dev/null || true
+chmod 644 "$OUTFILE"
+
+rm -f "$snap1" "$snap2" 2>/dev/null || true
+exit 0
+EOF
+
+# replace placeholder with actual SAMPLE_INTERVAL
+sed -i "s|__SAMPLE_INTERVAL__|$SAMPLE_INTERVAL|g" "$PROCESS_SCRIPT"
+chmod 755 "$PROCESS_SCRIPT" || true
+chown root:root "$PROCESS_SCRIPT" 2>/dev/null || true
+
+# 4) service + timer
+cat > "$SERVICE_FILE" <<EOF
+[Unit]
+Description=Collect process CPU percent (sampling) for Node Exporter
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=$PROCESS_SCRIPT
+User=root
+Group=root
+EOF
+
+cat > "$TIMER_FILE" <<EOF
+[Unit]
+Description=Run process_monitor every ${COLLECT_INTERVAL}s
+
+[Timer]
+OnBootSec=${COLLECT_INTERVAL}s
+OnUnitActiveSec=${COLLECT_INTERVAL}s
+Unit=process_monitor.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl enable --now process_monitor.timer
+systemctl start process_monitor.service || true
+
+echo "Done — process CPU monitoring enabled. Metrics at: $TEXTFILE_DIR/process_cpu_metrics.prom"
+```
 
 👉 It performs all steps automatically (directory, drop-in, collector, service, and timer).
 
