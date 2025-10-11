@@ -1,0 +1,47 @@
+download from below link in chrome browser and move to target servers using WinSCP
+
+https://github.com/ncabatoff/process-exporter/releases
+
+mv process-exporter-0.8.7.linux-amd64.tar.gz /tmp
+cd /tmp/
+tar -xvf process-exporter-0.8.7.linux-amd64.tar.gz
+mv process-exporter-0.8.7.linux-amd64/process-exporter /usr/local/bin/
+chmod 755 /usr/local/bin/process-exporter
+useradd --no-create-home --shell /sbin/nologin process_exporter
+chown process_exporter:process_exporter /usr/local/bin/process-exporter
+mkdir -p /etc/process-exporter
+chown -R process_exporter:process_exporter /etc/process-exporter
+chmod 750 /etc/process-exporter
+  
+sudo tee /etc/process-exporter/process-exporter.yml > /dev/null <<'EOF'
+process_names:
+  - name: "{{.Comm}}"
+    cmdline:
+      - .*
+EOF
+
+sudo chown -R process_exporter:process_exporter /etc/process-exporter/process-exporter.yml
+chmod 644 /etc/process-exporter/process-exporter.yml
+
+sudo tee /etc/systemd/system/process-exporter.service > /dev/null <<'EOF'
+[Unit]
+Description=Prometheus Process Exporter
+After=network.target
+
+[Service]
+User=process_exporter
+Group=process_exporter
+ExecStart=/usr/local/bin/process-exporter --config.path=/etc/process-exporter/process-exporter.yml --web.listen-address=0.0.0.0:9256
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+ 
+sudo systemctl daemon-reload
+sudo systemctl reset-failed process-exporter
+sudo systemctl enable --now process-exporter
+sudo systemctl status process-exporter -l
